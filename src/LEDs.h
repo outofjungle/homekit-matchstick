@@ -14,18 +14,20 @@ struct LEDs
         FastLED.show();
     }
 
-    bool On(bool state, uint8_t level)
+    bool On(bool state, float H, float S, float V)
     {
+        uint8_t hue = (uint8_t)(H * 255 / 360);
+        uint8_t saturation = (uint8_t)(S * 25.5);
 
-        uint8_t dimmed = (uint8_t)ceil((double)level / 10);
-        uint8_t trimmed = (uint8_t)(level % 10) * 25.5;
+        uint8_t dimmed = (uint8_t)ceil(V / 10);
+        uint8_t trimmed = (uint8_t)(uint8_t(V) % 10) * 25.5;
         if (state)
         {
             fill_solid(leds, length, CRGB::Black);
-            fill_solid(leds, dimmed, CRGB::White);
+            fill_solid(leds, dimmed, CHSV(hue, saturation, 0xFF));
             if (trimmed > 0)
             {
-                leds[dimmed - 1].setRGB(trimmed, trimmed, trimmed);
+                leds[dimmed - 1] = CHSV(hue, saturation, trimmed);
             }
         }
         else
