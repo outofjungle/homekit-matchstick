@@ -1,56 +1,60 @@
-#include <M5StickCPlus.h>
 #include <FastLED.h>
+#include <math.h>
 
-#define CLOCK_PIN 25
-#define DATA_PIN 26
-
-#define NUM_LEDS 10
-#define DELAY 42
-
+template <uint8_t length, uint8_t clock_pin, uint8_t data_pin>
 struct LEDs
 {
-    CRGB leds[NUM_LEDS];
+    CRGB leds[length];
 
     LEDs()
     {
-        M5.begin();
-        pinMode(25, INPUT);
-        gpio_pulldown_dis(GPIO_NUM_36);
-        gpio_pullup_dis(GPIO_NUM_36);
-
-        FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, BGR>(leds, NUM_LEDS);
+        FastLED.addLeds<APA102, data_pin, clock_pin, BGR>(leds, length);
         FastLED.setBrightness(0xFF);
-        fill_solid(leds, NUM_LEDS, CRGB::Black);
+        fill_solid(leds, length, CRGB::Black);
         FastLED.show();
     }
 
-    bool On(int start, int end, bool state)
+    bool On(bool state, uint8_t level)
     {
-        if (start < 0 || start > NUM_LEDS || end < 0 || end > NUM_LEDS)
-        {
-            return (false);
-        }
 
-        if (start > end)
-        {
-            return (false);
-        }
-
-        CRGB color;
+        uint8_t dimmed = (uint8_t)ceil((double)level / 10);
+        uint8_t trimmed = (uint8_t)(level % 10) * 25.5;
         if (state)
         {
-            color = CRGB::White;
+            fill_solid(leds, length, CRGB::Black);
+            fill_solid(leds, dimmed, CRGB::White);
+            if (trimmed > 0)
+            {
+                leds[dimmed - 1].setRGB(trimmed, trimmed, trimmed);
+            }
         }
         else
         {
-            color = CRGB::Black;
+            fill_solid(leds, length, CRGB::Black);
         }
 
-        for (int i = start; i <= end; i++)
+        FastLED.show();
+        return (true);
+    }
+
+    bool Blink()
+    {
+        for (uint8_t i = 0; i < length; i++)
         {
-            leds[i] = color;
+            fill_solid(leds, length, CRGB::Black);
+            leds[i] = CRGB::White;
+            FastLED.show();
+            delay(50);
+        }
+        for (uint8_t i = length - 1; i >= 0; i--)
+        {
+            fill_solid(leds, length, CRGB::Black);
+            leds[i] = CRGB::White;
+            FastLED.show();
+            delay(50);
         }
 
+        fill_solid(leds, length, CRGB::Black);
         FastLED.show();
         return (true);
     }

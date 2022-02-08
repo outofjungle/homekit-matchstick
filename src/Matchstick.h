@@ -1,19 +1,23 @@
+template <uint8_t length, uint8_t clock_pin, uint8_t data_pin>
 struct Matchstick : Service::LightBulb
 {
-    LEDs *leds;
-    int start, end;
+    LEDs<length, clock_pin, data_pin> *leds;
     SpanCharacteristic *power;
+    SpanCharacteristic *level;
 
-    Matchstick(LEDs *leds, int start, int end) : Service::LightBulb()
+    Matchstick(LEDs<length, clock_pin, data_pin> *leds) : Service::LightBulb()
     {
         power = new Characteristic::On();
+        level = new Characteristic::Brightness(50);
+        level->setRange(0, 100, 1);
+
         this->leds = leds;
-        this->start = start;
-        this->end = end;
     }
 
     boolean update()
     {
-        return leds->On(start, end, power->getNewVal());
+        return leds->On(
+            power->getNewVal(),
+            level->getNewVal());
     }
 };
