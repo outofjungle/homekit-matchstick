@@ -5,6 +5,7 @@
 #include "MatchstickAccessoryInfo.h"
 #include "Matchstick.h"
 
+#define BUTTON_PIN 37
 #define CLOCK_PIN 25
 #define DATA_PIN 26
 #define LED_LENGTH 10
@@ -34,7 +35,7 @@ void setup()
   new Service::HAPProtocolInformation();
   new Characteristic::Version("1.1.0");
 
-  new Matchstick<LED_LENGTH, CLOCK_PIN, DATA_PIN>(leds);
+  new Matchstick<LED_LENGTH, CLOCK_PIN, DATA_PIN>(leds, BUTTON_PIN);
 }
 
 void loop()
