@@ -25,7 +25,6 @@ struct LedArray
         this->saturation = 0;
         transformSetV(50);
 
-        fastled->setBrightness(0xFF);
         fill_solid(leds, length, CRGB::Black);
         fastled->show();
     }
@@ -39,7 +38,7 @@ struct LedArray
     {
         float transfrom = float(length * brightness) / 100;
         this->onLength = (uint8_t)ceil(transfrom);
-        this->trimmedVal = (uint8_t)((transfrom - onLength) * 255);
+        this->trimmedVal = (uint8_t)((transfrom - onLength) * 0xFF);
     }
 
     void SetValues(float H, float S, float V)

@@ -44,6 +44,12 @@ void setup()
   FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, LED_LENGTH);
 #endif
 
+#if BUILD_ENV_NAME == AtomMatrix
+  FastLED.setBrightness(0x14);
+#elif
+  FastLED.setBrightness(0xFF);
+#endif
+
   LedArray *ledArray = new LedArray(&FastLED, leds, LED_LENGTH);
 
   sprintf(name, "Matchstick-%04d", BUILD_ENV_NAME);
