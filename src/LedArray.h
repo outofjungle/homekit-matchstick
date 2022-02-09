@@ -1,25 +1,33 @@
 #include <FastLED.h>
+#include <colorutils.h>
 #include <math.h>
 
-template <uint8_t length, uint8_t clock_pin, uint8_t data_pin>
-struct LEDs
+struct LedArray
 {
-    CRGB leds[length];
-    uint8_t hue, saturation, value, onLength, trimmedVal;
+    CFastLED *fastled;
+    CRGB *leds;
     bool state;
+    uint8_t length,
+        hue,
+        saturation,
+        value,
+        onLength,
+        trimmedVal;
 
-    LEDs()
+    LedArray(CFastLED *fastled, CRGB *leds, uint8_t length)
     {
+        this->fastled = fastled;
+        this->leds = leds;
+        this->length = length;
+
         this->state = true;
         this->hue = 0;
         this->saturation = 0;
-        this->onLength = 5;
-        this->trimmedVal = 0;
+        transformSetV(50);
 
-        FastLED.addLeds<APA102, data_pin, clock_pin, BGR>(leds, length);
-        FastLED.setBrightness(0xFF);
+        fastled->setBrightness(0xFF);
         fill_solid(leds, length, CRGB::Black);
-        FastLED.show();
+        fastled->show();
     }
 
     void SetPower(bool state)
@@ -27,12 +35,18 @@ struct LEDs
         this->state = state;
     }
 
+    void transformSetV(int brightness)
+    {
+        float transfrom = float(length * brightness) / 100;
+        this->onLength = (uint8_t)ceil(transfrom);
+        this->trimmedVal = (uint8_t)((transfrom - onLength) * 255);
+    }
+
     void SetValues(float H, float S, float V)
     {
         this->hue = (uint8_t)(H * 255 / 360);
-        this->saturation = (uint8_t)(S * 25.5);
-        this->onLength = (uint8_t)ceil(V / 10);
-        this->trimmedVal = (uint8_t)(uint8_t(V) % 10) * 25.5;
+        this->saturation = (uint8_t)(S * 2.55);
+        transformSetV(V);
     }
 
     bool On()
@@ -51,7 +65,7 @@ struct LEDs
             fill_solid(leds, length, CRGB::Black);
         }
 
-        FastLED.show();
+        fastled->show();
         return (true);
     }
 
@@ -61,19 +75,19 @@ struct LEDs
         {
             fill_solid(leds, length, CRGB::Black);
             leds[i] = CRGB::White;
-            FastLED.show();
+            fastled->show();
             delay(50);
         }
         for (uint8_t i = length - 1; i >= 0; i--)
         {
             fill_solid(leds, length, CRGB::Black);
             leds[i] = CRGB::White;
-            FastLED.show();
+            fastled->show();
             delay(50);
         }
 
         fill_solid(leds, length, CRGB::Black);
-        FastLED.show();
+        fastled->show();
         return (true);
     }
 };

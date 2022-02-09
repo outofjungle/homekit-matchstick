@@ -1,7 +1,6 @@
-template <uint8_t length, uint8_t clock_pin, uint8_t data_pin>
 struct MatchstickAccessoryInfo : Service::AccessoryInformation
 {
-    LEDs<length, clock_pin, data_pin> *leds;
+    LedArray *ledArray;
     SpanCharacteristic *identify;
 
     MatchstickAccessoryInfo(
@@ -10,7 +9,7 @@ struct MatchstickAccessoryInfo : Service::AccessoryInformation
         const char *serial,
         const char *model,
         const char *version,
-        LEDs<length, clock_pin, data_pin> *leds) : Service::AccessoryInformation()
+        LedArray *l) : Service::AccessoryInformation()
     {
 
         new Characteristic::Name(name);
@@ -19,11 +18,11 @@ struct MatchstickAccessoryInfo : Service::AccessoryInformation
         new Characteristic::Model(model);
         new Characteristic::FirmwareRevision(version);
         identify = new Characteristic::Identify();
-        this->leds = leds;
+        this->ledArray = l;
     }
 
     boolean update()
     {
-        return (leds->Blink());
+        return (ledArray->Blink());
     }
 };

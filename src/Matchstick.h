@@ -1,14 +1,13 @@
-template <uint8_t length, uint8_t clock_pin, uint8_t data_pin>
 struct Matchstick : Service::LightBulb
 {
     uint8_t togglePin;
-    LEDs<length, clock_pin, data_pin> *leds;
+    LedArray *ledArray;
     SpanCharacteristic *power;
     SpanCharacteristic *H;
     SpanCharacteristic *S;
     SpanCharacteristic *V;
 
-    Matchstick(LEDs<length, clock_pin, data_pin> *leds, uint8_t togglePin) : Service::LightBulb()
+    Matchstick(LedArray *ledArray, uint8_t togglePin) : Service::LightBulb()
     {
         power = new Characteristic::On();
         H = new Characteristic::Hue(0);
@@ -19,7 +18,7 @@ struct Matchstick : Service::LightBulb
         new SpanButton(togglePin);
         this->togglePin = togglePin;
 
-        this->leds = leds;
+        this->ledArray = ledArray;
     }
 
     bool update()
@@ -52,9 +51,9 @@ struct Matchstick : Service::LightBulb
             v = V->getNewVal<float>();
         }
 
-        leds->SetPower(p);
-        leds->SetValues(h, s, v);
-        return leds->On();
+        ledArray->SetPower(p);
+        ledArray->SetValues(h, s, v);
+        return ledArray->On();
     }
 
     void button(int pin, int type) override
@@ -63,8 +62,8 @@ struct Matchstick : Service::LightBulb
         {
             bool p = 1 - power->getVal();
             power->setVal(p);
-            leds->SetPower(p);
-            leds->On();
+            ledArray->SetPower(p);
+            ledArray->On();
         }
     }
 };
