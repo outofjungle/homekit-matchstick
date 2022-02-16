@@ -3,6 +3,7 @@
 #else
 #define M5StickC 0x10
 #define AtomMatrix 0x20
+#define StampPico 0x30
 #endif
 
 #include <Arduino.h>
@@ -22,6 +23,11 @@
 #define BUTTON_PIN 39
 #define DATA_PIN 27
 #define LED_LENGTH 25
+#elif BUILD_ENV_NAME == StampPico
+#define BUTTON_PIN 39
+#define CLOCK_PIN 25
+#define DATA_PIN 26
+#define LED_LENGTH 8
 #endif
 
 CRGB leds[LED_LENGTH];
@@ -42,11 +48,13 @@ void setup()
 #elif BUILD_ENV_NAME == AtomMatrix
   M5.begin();
   FastLED.addLeds<WS2812, DATA_PIN, GRB>(leds, LED_LENGTH);
+#elif BUILD_ENV_NAME == StampPico
+  FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, BGR>(leds, LED_LENGTH);
 #endif
 
 #if BUILD_ENV_NAME == AtomMatrix
   FastLED.setBrightness(0x14);
-#elif
+#else
   FastLED.setBrightness(0xFF);
 #endif
 
